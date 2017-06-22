@@ -134,7 +134,7 @@
                 {
                     using (new WaitCursorChanger(this.documentWorkspace))
                     {
-                        this.maskedSurface = ClipboardUtil.GetClipboardImage(this.documentWorkspace, this.clipData);
+                        this.maskedSurface = ClipboardUtil.TryGetClipboardImage(this.documentWorkspace, this.clipData);
                     }
                 }
                 catch (OutOfMemoryException exception3)

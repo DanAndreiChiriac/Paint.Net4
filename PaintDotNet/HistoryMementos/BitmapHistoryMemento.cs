@@ -10,7 +10,7 @@
     using System.IO;
     using System.Runtime.InteropServices;
 
-    internal class BitmapHistoryMemento : HistoryMemento
+    internal sealed class BitmapHistoryMemento : HistoryMemento
     {
         private IHistoryWorkspace historyWorkspace;
         private int layerIndex;

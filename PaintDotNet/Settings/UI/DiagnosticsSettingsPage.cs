@@ -149,7 +149,7 @@
         private IEnumerable<KeyValuePair<string, string>> GetRows()
         {
             yield return CreateRow(0, "Application", PdnInfo.FullAppName);
-            yield return CreateRow(0, "Build Date", PdnInfo.BuildTime.ToLongDateString());
+            yield return CreateRow(0, "Build Date", PdnInfo.BuildTimeUtc.ToLongDateString());
             if (PdnInfo.WillExpire)
             {
                 yield return CreateRow(0, "Expiration Date", PdnInfo.ExpirationDate.ToLongDateString());

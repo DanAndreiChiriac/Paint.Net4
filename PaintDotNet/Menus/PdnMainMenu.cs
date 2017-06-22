@@ -1,6 +1,7 @@
 ﻿namespace PaintDotNet.Menus
 {
     using PaintDotNet.Controls;
+    using PaintDotNet.Diagnostics;
     using PaintDotNet.SystemLayer;
     using System;
     using System.Windows.Forms;
@@ -40,8 +41,11 @@
 
         public void PopulateEffects()
         {
-            this.adjustmentsMenu.PopulateEffects();
-            this.effectsMenu.PopulateEffects();
+            using (Profiling.UseEnter())
+            {
+                this.adjustmentsMenu.PopulateEffects();
+                this.effectsMenu.PopulateEffects();
+            }
         }
 
         public void RunEffect(System.Type effectType)

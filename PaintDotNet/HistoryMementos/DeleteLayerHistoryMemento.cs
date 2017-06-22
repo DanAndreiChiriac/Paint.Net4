@@ -3,7 +3,7 @@
     using PaintDotNet;
     using System;
 
-    internal class DeleteLayerHistoryMemento : HistoryMemento
+    internal sealed class DeleteLayerHistoryMemento : HistoryMemento
     {
         private IHistoryWorkspace historyWorkspace;
         private int index;

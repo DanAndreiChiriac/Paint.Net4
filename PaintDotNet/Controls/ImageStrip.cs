@@ -311,14 +311,14 @@
 
         protected virtual void DrawItemImage(IDrawingContext dc, Item item, RectInt32 itemRect, RectInt32 imageRect, RectInt32 imageInsetRect)
         {
-            if (item.Image == null)
+            if ((item.Image == null) && (this.BusyAnimationFrames.Length != 0))
             {
                 int num = this.busyAnimationFrame.Value;
                 DeviceBitmap bitmap = this.BusyAnimationFrames[num % this.BusyAnimationFrames.Length];
                 RectInt32 num2 = new RectInt32(itemRect.X + ((imageRect.Width - bitmap.PixelSize.Width) / 2), itemRect.Y + ((imageRect.Height - bitmap.PixelSize.Height) / 2), bitmap.PixelSize.Width, bitmap.PixelSize.Height);
                 dc.DrawBitmap(bitmap, new RectDouble?(num2), 1.0, BitmapInterpolationMode.Linear, null);
             }
-            else
+            else if (item.Image != null)
             {
                 dc.DrawBitmap(item.DeviceImage, new RectDouble?(imageInsetRect), (double) ((float) item.ImageOpacity.Value), BitmapInterpolationMode.Linear, null);
             }

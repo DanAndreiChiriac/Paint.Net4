@@ -1,4 +1,4 @@
-﻿// Assembly PaintDotNet, Version 4.13.6191.1824
+﻿// Assembly PaintDotNet, Version 4.16.6315.38530
 
 [assembly: System.Runtime.CompilerServices.Extension]
 [assembly: System.Runtime.CompilerServices.CompilationRelaxations(8)]
@@ -11,7 +11,7 @@
 [assembly: System.Reflection.AssemblyDescription("Image and photo editing software.")]
 [assembly: System.Reflection.AssemblyCompany("dotPDN LLC")]
 [assembly: System.Reflection.AssemblyTrademark("paint.net is a registered trademark of dotPDN LLC")]
-[assembly: System.Reflection.AssemblyCopyright("Copyright \x00a9 2016 dotPDN LLC, Rick Brewster, and past contributors. All Rights Reserved.")]
+[assembly: System.Reflection.AssemblyCopyright("Copyright \x00a9 2017 dotPDN LLC, Rick Brewster, and past contributors. All Rights Reserved.")]
 [assembly: System.Reflection.AssemblyConfiguration("Final")]
 [assembly: System.Reflection.AssemblyTitle("paint.net")]
 [assembly: System.Runtime.CompilerServices.Dependency("PaintDotNet.Base", System.Runtime.CompilerServices.LoadHint.Always)]

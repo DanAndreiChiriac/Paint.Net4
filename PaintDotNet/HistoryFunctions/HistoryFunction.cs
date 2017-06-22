@@ -1,9 +1,11 @@
 ﻿namespace PaintDotNet.HistoryFunctions
 {
     using PaintDotNet;
+    using PaintDotNet.Collections;
     using PaintDotNet.HistoryMementos;
     using System;
-    using System.ComponentModel;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading;
 
@@ -11,15 +13,7 @@
     {
         private PaintDotNet.ActionFlags actionFlags;
         private int criticalRegionCount;
-        private ISynchronizeInvoke eventSink;
         private bool executed;
-        private volatile bool pleaseCancel;
-
-        [field: CompilerGenerated]
-        public event EventHandler CancelRequested;
-
-        [field: CompilerGenerated]
-        public event ValueEventHandler<HistoryMemento> Finished;
 
         public HistoryFunction(PaintDotNet.ActionFlags actionFlags)
         {
@@ -33,113 +27,55 @@
 
         public HistoryMemento Execute(IHistoryWorkspace historyWorkspace)
         {
-            HistoryMemento memento = null;
-            Exception exception = null;
             HistoryMemento memento2;
             try
             {
-                try
+                if (this.executed)
                 {
-                    if (this.executed)
-                    {
-                        ExceptionUtil.ThrowInvalidOperationException("Already executed this HistoryFunction");
-                    }
-                    this.executed = true;
-                    memento = this.OnExecute(historyWorkspace);
-                    memento2 = memento;
+                    throw new InvalidOperationException("Already executed this HistoryFunction");
                 }
-                catch (ArgumentOutOfRangeException exception2)
-                {
-                    if (this.criticalRegionCount > 0)
-                    {
-                        throw;
-                    }
-                    throw new HistoryFunctionNonFatalException(null, exception2);
-                }
-                catch (OutOfMemoryException exception3)
-                {
-                    if (this.criticalRegionCount > 0)
-                    {
-                        throw;
-                    }
-                    throw new HistoryFunctionNonFatalException(null, exception3);
-                }
+                this.executed = true;
+                memento2 = this.OnExecute(historyWorkspace);
             }
-            catch (Exception exception4)
+            catch (Exception exception)
             {
-                if (!this.IsAsync)
+                IEnumerable<Exception> innerExceptions;
+                if (this.criticalRegionCount > 0)
                 {
                     throw;
                 }
-                exception = exception4;
-                memento2 = memento;
-            }
-            finally
-            {
-                if (this.IsAsync)
+                AggregateException exception2 = exception as AggregateException;
+                if (exception2 != null)
                 {
-                    this.OnFinished(memento, exception);
+                    innerExceptions = exception2.Flatten().InnerExceptions;
                 }
+                else
+                {
+                    innerExceptions = EnumerableUtil.One<Exception>(exception);
+                }
+                if (innerExceptions.All<Exception>(innerEx => ((innerEx is ArgumentOutOfRangeException) || (innerEx is OperationCanceledException)) || (innerEx is OutOfMemoryException)))
+                {
+                    throw new HistoryFunctionNonFatalException(null, exception);
+                }
+                throw;
             }
             return memento2;
         }
 
-        private void ExecuteTrampoline(object context)
-        {
-            this.Execute((IHistoryWorkspace) context);
-        }
-
-        protected virtual void OnCancelRequested()
-        {
-            if (!this.pleaseCancel)
-            {
-                ExceptionUtil.ThrowInvalidOperationException("OnCancelRequested() was called when pleaseCancel equaled false");
-            }
-            if (this.CancelRequested != null)
-            {
-                object[] args = new object[] { this, EventArgs.Empty };
-                this.eventSink.BeginInvoke(this.CancelRequested, args);
-            }
-        }
-
         public abstract HistoryMemento OnExecute(IHistoryWorkspace historyWorkspace);
-        private void OnFinished(HistoryMemento memento, Exception exception)
-        {
-            if (this.eventSink.InvokeRequired)
-            {
-                object[] args = new object[] { memento, exception };
-                this.eventSink.BeginInvoke(new Action<HistoryMemento, Exception>(this.OnFinished), args);
-            }
-            else
-            {
-                if (exception != null)
-                {
-                    throw new WorkerThreadException(exception);
-                }
-                this.Finished.Raise<HistoryMemento>(this, memento);
-            }
-        }
 
         public PaintDotNet.ActionFlags ActionFlags =>
             this.actionFlags;
 
-        public ISynchronizeInvoke EventSink
+        [Serializable, CompilerGenerated]
+        private sealed class <>c
         {
-            get
-            {
-                if (!this.IsAsync)
-                {
-                    ExceptionUtil.ThrowInvalidOperationException("EventSink property is only accessible when IsAsync is true");
-                }
-                return this.eventSink;
-            }
+            public static readonly HistoryFunction.<>c <>9 = new HistoryFunction.<>c();
+            public static Func<Exception, bool> <>9__5_0;
+
+            internal bool <Execute>b__5_0(Exception innerEx) => 
+                (((innerEx is ArgumentOutOfRangeException) || (innerEx is OperationCanceledException)) || (innerEx is OutOfMemoryException));
         }
-
-        public bool IsAsync =>
-            (this.eventSink > null);
-
-        protected bool PleaseCancel =>
-            this.pleaseCancel;
     }
 }
 

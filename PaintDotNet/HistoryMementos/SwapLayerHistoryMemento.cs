@@ -3,7 +3,7 @@
     using PaintDotNet;
     using System;
 
-    internal class SwapLayerHistoryMemento : HistoryMemento
+    internal sealed class SwapLayerHistoryMemento : HistoryMemento
     {
         private IHistoryWorkspace historyWorkspace;
         private int layerIndex1;
@@ -25,18 +25,18 @@
             SwapLayerHistoryMemento memento = new SwapLayerHistoryMemento(base.Name, base.Image, this.historyWorkspace, this.layerIndex2, this.layerIndex1);
             using (this.historyWorkspace.Document.Layers.UseChangeScope())
             {
-                Layer layer = (Layer) this.historyWorkspace.Document.Layers[this.layerIndex1];
+                Layer item = (Layer) this.historyWorkspace.Document.Layers[this.layerIndex1];
                 Layer layer2 = (Layer) this.historyWorkspace.Document.Layers[this.layerIndex2];
                 int num = Math.Min(this.layerIndex1, this.layerIndex2);
                 if ((Math.Max(this.layerIndex1, this.layerIndex2) - num) == 1)
                 {
                     this.historyWorkspace.Document.Layers.RemoveAt(this.layerIndex1);
-                    this.historyWorkspace.Document.Layers.Insert(this.layerIndex2, layer);
+                    this.historyWorkspace.Document.Layers.Insert(this.layerIndex2, item);
                 }
                 else
                 {
                     this.historyWorkspace.Document.Layers[this.layerIndex1] = layer2;
-                    this.historyWorkspace.Document.Layers[this.layerIndex2] = layer;
+                    this.historyWorkspace.Document.Layers[this.layerIndex2] = item;
                 }
                 this.historyWorkspace.Document.Invalidate();
             }

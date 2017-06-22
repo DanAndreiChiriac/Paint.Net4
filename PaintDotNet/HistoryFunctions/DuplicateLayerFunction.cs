@@ -22,14 +22,14 @@
                 object[] objArray1 = new object[] { "layerIndex = ", this.layerIndex, ", expected [0, ", historyWorkspace.Document.Layers.Count, ")" };
                 throw new ArgumentOutOfRangeException(string.Concat(objArray1));
             }
-            Layer layer = null;
-            layer = RetryManager.RunMemorySensitiveOperation<Layer>(() => (Layer) historyWorkspace.ActiveLayer.Clone());
-            layer.IsBackground = false;
+            Layer item = null;
+            item = RetryManager.RunMemorySensitiveOperation<Layer>(() => (Layer) historyWorkspace.ActiveLayer.Clone());
+            item.IsBackground = false;
             int layerIndex = 1 + this.layerIndex;
             HistoryMemento memento = new NewLayerHistoryMemento(StaticName, StaticImage, historyWorkspace, layerIndex);
             base.EnterCriticalRegion();
-            historyWorkspace.Document.Layers.Insert(layerIndex, layer);
-            layer.Invalidate();
+            historyWorkspace.Document.Layers.Insert(layerIndex, item);
+            item.Invalidate();
             return memento;
         }
 

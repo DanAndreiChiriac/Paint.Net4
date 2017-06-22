@@ -20,7 +20,7 @@
             int layerIndex = historyWorkspace.ActiveLayerIndex + 1;
             NewLayerHistoryMemento memento = new NewLayerHistoryMemento(PdnResources.GetString("AddNewBlankLayer.HistoryMementoName"), PdnResources.GetImageResource("Icons.MenuLayersAddNewLayerIcon.png"), historyWorkspace, layerIndex);
             base.EnterCriticalRegion();
-            historyWorkspace.Document.Layers.Insert(layerIndex, layer);
+            historyWorkspace.Document.Layers.Insert(layerIndex, (Layer) layer);
             return memento;
         }
     }

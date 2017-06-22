@@ -221,7 +221,7 @@
             Layer[] excluded = this.layers.ToArrayEx<Layer>();
             if (this.document != null)
             {
-                newLayers = this.document.Layers.Cast<Layer>().ToArrayEx<Layer>();
+                newLayers = this.document.Layers.ToArrayEx<Layer>();
             }
             else
             {

@@ -3,7 +3,7 @@
     using PaintDotNet;
     using System;
 
-    internal class NullHistoryMemento : HistoryMemento
+    internal sealed class NullHistoryMemento : HistoryMemento
     {
         public NullHistoryMemento(string name, ImageResource image) : base(name, image)
         {

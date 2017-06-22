@@ -18,7 +18,7 @@
             {
                 using (NewFileDialog dialog = new NewFileDialog())
                 {
-                    SizeInt32? clipboardImageSize;
+                    SizeInt32? nullable;
                     SizeInt32 newDocumentSize = appWorkspace.GetNewDocumentSize();
                     using (new WaitCursorChanger(appWorkspace))
                     {
@@ -26,18 +26,18 @@
                         try
                         {
                             IPdnDataObject dataObject = PdnClipboard.GetDataObject();
-                            clipboardImageSize = ClipboardUtil.GetClipboardImageSize(appWorkspace, dataObject);
+                            nullable = ClipboardUtil.TryGetClipboardImageSize(appWorkspace, dataObject);
                             dataObject = null;
                         }
                         catch (Exception)
                         {
-                            clipboardImageSize = null;
+                            nullable = null;
                         }
                         CleanupManager.RequestCleanup();
                     }
-                    if (clipboardImageSize.HasValue)
+                    if (nullable.HasValue)
                     {
-                        newDocumentSize = clipboardImageSize.Value;
+                        newDocumentSize = nullable.Value;
                     }
                     dialog.OriginalSize = new Size(newDocumentSize.Width, newDocumentSize.Height);
                     dialog.OriginalDpuUnit = AppSettings.Instance.Workspace.LastNonPixelUnits.Value;

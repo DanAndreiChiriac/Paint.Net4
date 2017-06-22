@@ -4,7 +4,7 @@
     using System;
     using System.Collections.Generic;
 
-    internal class CompoundHistoryMemento : HistoryMemento
+    internal sealed class CompoundHistoryMemento : HistoryMemento
     {
         private List<HistoryMemento> mementos;
 

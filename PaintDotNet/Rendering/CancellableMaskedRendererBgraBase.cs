@@ -6,7 +6,7 @@
     using System.Runtime.CompilerServices;
     using System.Threading;
 
-    internal abstract class CancellableMaskedRendererBgraBase : MaskedRendererBgraBase, ICancellable
+    internal abstract class CancellableMaskedRendererBgraBase : MaskedRendererBgraBase, ICancellable, ICancellationToken
     {
         private int isCancellationRequested;
 

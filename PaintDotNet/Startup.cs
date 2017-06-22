@@ -326,12 +326,13 @@
             AppSettings.Instance.UI.Language.Value = info;
             PdnResources.Culture = info;
             AppSettings.Instance.UI.ErrorFlagsAtStartup.Value = AppSettings.Instance.UI.ErrorFlags.Value;
+            WorkItemDispatcher.Initialize(AppSettings.Instance.Performance.ThreadUtilizationPolicy.Value);
             UIUtil.IsGetMouseMoveScreenPointsEnabled = AppSettings.Instance.UI.EnableSmoothMouseInput.Value;
             if (!OS.VerifyFrameworkVersion(4, 6, 0, OS.FrameworkProfile.Full))
             {
                 string message = PdnResources.GetString("Error.FXRequirement");
                 MessageBoxUtil.ErrorBox(null, message);
-                string fxurl = "http://www.microsoft.com/en-us/download/details.aspx?id=40773";
+                string fxurl = "https://www.microsoft.com/en-us/download/details.aspx?id=53345";
                 () => ShellUtil.LaunchUrl2(null, fxurl).Eval<bool>().Observe();
             }
             else if (!OS.VerifyWindowsVersion(6, 1, 1))

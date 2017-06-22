@@ -1770,13 +1770,13 @@
         private sealed class TableLayoutData
         {
             private Dictionary<Control, ImageSizeDialog.ControlInfo> controls = new Dictionary<Control, ImageSizeDialog.ControlInfo>();
-            private System.Collections.ObjectModel.ReadOnlyDictionary<Control, ImageSizeDialog.ControlInfo> controlsRO;
+            private ReadOnlyDictionary<Control, ImageSizeDialog.ControlInfo> controlsRO;
             private List<ImageSizeDialog.RowInfo> rows;
             private ReadOnlyCollection<ImageSizeDialog.RowInfo> rowsRO;
 
             public TableLayoutData()
             {
-                this.controlsRO = new System.Collections.ObjectModel.ReadOnlyDictionary<Control, ImageSizeDialog.ControlInfo>(this.controls);
+                this.controlsRO = new ReadOnlyDictionary<Control, ImageSizeDialog.ControlInfo>(this.controls);
                 this.rows = new List<ImageSizeDialog.RowInfo>();
                 this.rowsRO = new ReadOnlyCollection<ImageSizeDialog.RowInfo>(this.rows);
             }

@@ -57,11 +57,7 @@
                 }
                 throw ExceptionUtil.InvalidEnumArgumentException<SelectionCombineMode>(changes.SelectionCombineMode, "changes.SelectionCombineMode");
             }
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return null;
-            }
-            Func<bool> isCancellationRequestedFn = () => cancellationToken.IsCancellationRequested;
+            cancellationToken.ThrowIfCancellationRequested();
             ColorBgra basis = sampleSource.GetPointSlow(pt);
             int width = ((sampleSource.Width + 0x1f) / 0x20) * 0x20;
             BitVector2D newStencil = new BitVector2D(width, sampleSource.Height);
@@ -88,22 +84,16 @@
             else
             {
                 RectInt32 num4;
-                FloodFillAlgorithm.FillStencilFromPoint<BitVector2DStruct>(sampleSource, newStencilWrapper, pt, tolerance, isCancellationRequestedFn, out num4);
-                goto Label_0293;
+                FloodFillAlgorithm.FillStencilFromPoint<BitVector2DStruct>(sampleSource, newStencilWrapper, pt, tolerance, cancellationToken, out num4);
+                goto Label_027D;
             }
             TileMathHelper tileMathHelper = new TileMathHelper(sampleSource.Width, sampleSource.Height, 7);
             Work.ParallelForEach<PointInt32>(WaitType.Pumping, tileMathHelper.EnumerateTileOffsets(), delegate (PointInt32 tileOffset) {
-                if (!cancellationToken.IsCancellationRequested)
-                {
-                    RectInt32 clipRect = tileMathHelper.GetTileSourceRect(tileOffset);
-                    FloodFillAlgorithm.FillStencilByColor<BitVector2DStruct>(sampleSource, newStencilWrapper, basis, tolerance, isCancellationRequestedFn, clipRect);
-                }
+                RectInt32 clipRect = tileMathHelper.GetTileSourceRect(tileOffset);
+                FloodFillAlgorithm.FillStencilByColor<BitVector2DStruct>(sampleSource, newStencilWrapper, basis, tolerance, cancellationToken, clipRect);
             }, WorkItemQueuePriority.Normal, null);
-        Label_0293:
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return null;
-            }
+        Label_027D:
+            cancellationToken.ThrowIfCancellationRequested();
             if (changes.SelectionCombineMode == SelectionCombineMode.Replace)
             {
                 list = GeometryList.FromStencil<BitVector2DStruct>(newStencilWrapper, cancellationToken);
@@ -111,19 +101,12 @@
             else if (lazyBaseStencil == null)
             {
                 GeometryList rhs = GeometryList.FromStencil<BitVector2DStruct>(newStencilWrapper, cancellationToken);
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return null;
-                }
+                cancellationToken.ThrowIfCancellationRequested();
                 list = GeometryList.Combine(changes.BaseGeometry, changes.SelectionCombineMode.ToGeometryCombineMode(), rhs);
             }
             else
             {
-                BitVector2D other = lazyBaseStencil.Value;
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return null;
-                }
+                BitVector2D other = lazyBaseStencil.CancelableValue<BitVector2D>();
                 switch (changes.SelectionCombineMode)
                 {
                     case SelectionCombineMode.Replace:
@@ -135,10 +118,7 @@
 
                     case SelectionCombineMode.Exclude:
                         newStencil.Invert();
-                        if (cancellationToken.IsCancellationRequested)
-                        {
-                            return null;
-                        }
+                        cancellationToken.ThrowIfCancellationRequested();
                         newStencil.And(other);
                         break;
 
@@ -153,16 +133,10 @@
                     default:
                         throw ExceptionUtil.InvalidEnumArgumentException<SelectionCombineMode>(changes.SelectionCombineMode, "changes.SelectionCombineMode");
                 }
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return null;
-                }
+                cancellationToken.ThrowIfCancellationRequested();
                 list = GeometryList.FromStencil<BitVector2DStruct>(newStencilWrapper, cancellationToken);
             }
-            if (cancellationToken.IsCancellationRequested)
-            {
-                return null;
-            }
+            cancellationToken.ThrowIfCancellationRequested();
             list.Freeze();
             return list;
         }
@@ -490,10 +464,7 @@
             BitVector2D vectord = new BitVector2D(width, height);
             foreach (RectInt32 num in geometry.EnumerateInteriorScans())
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return null;
-                }
+                cancellationToken.ThrowIfCancellationRequested();
                 vectord.Set(num, true);
             }
             return vectord;

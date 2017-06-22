@@ -3,7 +3,7 @@
     using PaintDotNet;
     using System;
 
-    internal class MetadataHistoryMemento : HistoryMemento
+    internal sealed class MetadataHistoryMemento : HistoryMemento
     {
         private IHistoryWorkspace historyWorkspace;
 

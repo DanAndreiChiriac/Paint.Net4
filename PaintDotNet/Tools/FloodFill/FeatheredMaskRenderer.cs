@@ -5,26 +5,27 @@
     using PaintDotNet.Imaging;
     using PaintDotNet.MemoryManagement;
     using PaintDotNet.Rendering;
+    using PaintDotNet.Threading;
     using System;
 
     internal sealed class FeatheredMaskRenderer : IRenderer<ColorAlpha8>
     {
         private ColorBgra basis;
+        private ICancellationToken cancelToken;
         private IRenderer<ColorBgra> colorSource;
         private byte invTolerance;
-        private Func<bool> isCancellationRequestedFn;
         private IRenderer<ColorAlpha8> stencilSource;
         private byte tolerance;
         private static readonly Func<byte, byte[]> toleranceToMaskValueLookupTable = Func.Memoize<byte, byte[]>(new Func<byte, byte[]>(FeatheredMaskRenderer.CreateMaskValueLookupTable));
 
-        public FeatheredMaskRenderer(IRenderer<ColorBgra> colorSource, ColorBgra basis, IRenderer<ColorAlpha8> stencilSource, byte tolerance, Func<bool> isCancellationRequestedFn)
+        public FeatheredMaskRenderer(IRenderer<ColorBgra> colorSource, ColorBgra basis, IRenderer<ColorAlpha8> stencilSource, byte tolerance, ICancellationToken cancelToken)
         {
-            Validate.Begin().IsNotNull<IRenderer<ColorBgra>>(colorSource, "colorSource").IsNotNull<IRenderer<ColorAlpha8>>(stencilSource, "stencilSource").IsNotNull<Func<bool>>(isCancellationRequestedFn, "isCancellationRequestedFn").Check();
+            Validate.Begin().IsNotNull<IRenderer<ColorBgra>>(colorSource, "colorSource").IsNotNull<IRenderer<ColorAlpha8>>(stencilSource, "stencilSource").IsNotNull<ICancellationToken>(cancelToken, "cancelToken").Check();
             this.colorSource = colorSource;
             this.basis = basis;
             this.stencilSource = stencilSource;
             this.tolerance = tolerance;
-            this.isCancellationRequestedFn = isCancellationRequestedFn;
+            this.cancelToken = cancelToken;
             this.invTolerance = (byte) (0xff - tolerance);
         }
 
@@ -125,64 +126,57 @@
 
         public unsafe void Render(ISurface<ColorAlpha8> dst, PointInt32 renderOffset)
         {
-            if (!this.isCancellationRequestedFn())
+            this.cancelToken.ThrowIfCancellationRequested<ICancellationToken>();
+            int width = dst.Width;
+            int height = dst.Height;
+            RectInt32 bounds = RectInt32.Inflate(new RectInt32(renderOffset, new SizeInt32(width, height)), 1, 1);
+            byte[] buffer = toleranceToMaskValueLookupTable(this.tolerance);
+            this.cancelToken.ThrowIfCancellationRequested<ICancellationToken>();
+            using (ISurface<ColorAlpha8> surface = UseTileOrToSurfaceWithEdgePadding(this.stencilSource, bounds, ColorAlpha8.Transparent))
             {
-                int width = dst.Width;
-                int height = dst.Height;
-                RectInt32 bounds = RectInt32.Inflate(new RectInt32(renderOffset, new SizeInt32(width, height)), 1, 1);
-                byte[] buffer = toleranceToMaskValueLookupTable(this.tolerance);
-                if (!this.isCancellationRequestedFn())
+                for (int i = 0; i < height; i++)
                 {
-                    using (ISurface<ColorAlpha8> surface = UseTileOrToSurfaceWithEdgePadding(this.stencilSource, bounds, ColorAlpha8.Transparent))
+                    this.cancelToken.ThrowIfCancellationRequested<ICancellationToken>();
+                    byte* rowPointer = (byte*) dst.GetRowPointer<ColorAlpha8>(i);
+                    byte* numPtr2 = (byte*) surface.GetPointPointer<ColorAlpha8>(0, i);
+                    byte* numPtr3 = (byte*) surface.GetPointPointer<ColorAlpha8>(0, (i + 1));
+                    byte* numPtr4 = (byte*) surface.GetPointPointer<ColorAlpha8>(0, (i + 2));
+                    for (int j = 0; j < width; j++)
                     {
-                        for (int i = 0; i < height; i++)
+                        byte num6;
+                        byte num7 = numPtr3[1];
+                        if (num7 != 0)
                         {
-                            if (this.isCancellationRequestedFn())
+                            num6 = num7;
+                        }
+                        else
+                        {
+                            byte num8 = numPtr2[0];
+                            byte num9 = numPtr2[1];
+                            byte num10 = numPtr2[2];
+                            byte num11 = numPtr3[0];
+                            byte num12 = numPtr3[2];
+                            byte num13 = numPtr4[0];
+                            byte num14 = numPtr4[1];
+                            byte num15 = numPtr4[2];
+                            if ((((num8 == 0xff) || (num9 == 0xff)) || ((num10 == 0xff) || (num11 == 0xff))) || (((num12 == 0xff) || (num13 == 0xff)) || ((num14 == 0xff) || (num15 == 0xff))))
                             {
-                                return;
+                                ColorBgra b = this.colorSource.GetPointSlow(j + renderOffset.X, i + renderOffset.Y);
+                                byte distance = FloodFillAlgorithm.GetDistance(this.basis, b);
+                                byte mask = buffer[distance];
+                                byte coverage = this.GetCoverageValue(num8, num9, num10, num11, num12, num13, num14, num15);
+                                num6 = this.CombineMaskAndCoverageValues(mask, coverage);
                             }
-                            byte* rowPointer = (byte*) dst.GetRowPointer<ColorAlpha8>(i);
-                            byte* numPtr2 = (byte*) surface.GetPointPointer<ColorAlpha8>(0, i);
-                            byte* numPtr3 = (byte*) surface.GetPointPointer<ColorAlpha8>(0, (i + 1));
-                            byte* numPtr4 = (byte*) surface.GetPointPointer<ColorAlpha8>(0, (i + 2));
-                            for (int j = 0; j < width; j++)
+                            else
                             {
-                                byte num6;
-                                byte num7 = numPtr3[1];
-                                if (num7 != 0)
-                                {
-                                    num6 = num7;
-                                }
-                                else
-                                {
-                                    byte num8 = numPtr2[0];
-                                    byte num9 = numPtr2[1];
-                                    byte num10 = numPtr2[2];
-                                    byte num11 = numPtr3[0];
-                                    byte num12 = numPtr3[2];
-                                    byte num13 = numPtr4[0];
-                                    byte num14 = numPtr4[1];
-                                    byte num15 = numPtr4[2];
-                                    if ((((num8 == 0xff) || (num9 == 0xff)) || ((num10 == 0xff) || (num11 == 0xff))) || (((num12 == 0xff) || (num13 == 0xff)) || ((num14 == 0xff) || (num15 == 0xff))))
-                                    {
-                                        ColorBgra b = this.colorSource.GetPointSlow(j + renderOffset.X, i + renderOffset.Y);
-                                        byte distance = FloodFillAlgorithm.GetDistance(this.basis, b);
-                                        byte mask = buffer[distance];
-                                        byte coverage = this.GetCoverageValue(num8, num9, num10, num11, num12, num13, num14, num15);
-                                        num6 = this.CombineMaskAndCoverageValues(mask, coverage);
-                                    }
-                                    else
-                                    {
-                                        num6 = 0;
-                                    }
-                                }
-                                rowPointer[0] = num6;
-                                rowPointer++;
-                                numPtr2++;
-                                numPtr3++;
-                                numPtr4++;
+                                num6 = 0;
                             }
                         }
+                        rowPointer[0] = num6;
+                        rowPointer++;
+                        numPtr2++;
+                        numPtr3++;
+                        numPtr4++;
                     }
                 }
             }

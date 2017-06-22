@@ -96,9 +96,7 @@
                     surface[j, i] = bgra;
                 }
             }
-            Document document = new Document(surface.Width, surface.Height);
-            document.Layers.Add(layer);
-            return document;
+            return new Document(surface.Width, surface.Height) { Layers = { (Layer) layer } };
         }
 
         protected override void OnSaveT(Document input, Stream output, PropertyBasedSaveConfigToken token, Surface scratchSurface, ProgressEventHandler callback)

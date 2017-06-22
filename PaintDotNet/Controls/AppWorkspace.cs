@@ -268,7 +268,7 @@
                     {
                         flag2 = true;
                     }
-                    document.Layers.Add(layer);
+                    document.Layers.Add((Layer) layer);
                     DocumentWorkspace lockMe = this.AddNewDocumentWorkspace();
                     this.Widgets.DocumentStrip.LockDocumentWorkspaceDirtyValue(lockMe, false);
                     lockMe.SuspendRefresh();

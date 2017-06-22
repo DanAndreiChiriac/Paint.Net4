@@ -10,7 +10,9 @@
 
     internal class StartupState : UpdatesState
     {
-        public const int MaxBuildAgeForUpdateChecking = 0xe42;
+        private const int FreshBuildAgeDaysForFrequentChecks = 10;
+        private const int FreshBuildUpdateCheckIntervalDays = 1;
+        private const int MaxBuildAgeDaysForUpdateChecking = 0xe42;
 
         public StartupState() : base(false, false, MarqueeStyle.Marquee)
         {
@@ -101,21 +103,30 @@
             {
                 return false;
             }
-            bool flag4 = AppSettings.Instance.Updates.AutoCheck.Value || PdnInfo.IsPrereleaseBuild;
-            TimeSpan span = new TimeSpan(MinBuildAgeForUpdateChecking, 0, 0, 0);
-            TimeSpan span2 = new TimeSpan(0xe42, 0, 0, 0);
-            TimeSpan span3 = (TimeSpan) (DateTime.Now - PdnInfo.BuildTime);
-            if ((span3 < span) || (span3 > span2))
+            bool flag3 = AppSettings.Instance.Updates.AutoCheck.Value || PdnInfo.IsPrereleaseBuild;
+            TimeSpan span = TimeSpan.FromDays(10.0);
+            TimeSpan span2 = TimeSpan.FromDays(3650.0);
+            TimeSpan span3 = (TimeSpan) (DateTime.UtcNow - PdnInfo.BuildTimeUtc);
+            if (span3 > span2)
             {
                 defaultValue = false;
             }
-            else if (flag4)
+            else if (flag3)
             {
+                TimeSpan span4;
+                if (span3 <= span)
+                {
+                    span4 = TimeSpan.FromDays(1.0);
+                }
+                else
+                {
+                    span4 = TimeSpan.FromDays((double) NormalUpdateCheckIntervalDays);
+                }
                 try
                 {
                     DateTime time = AppSettings.Instance.Updates.LastCheckTimeUtc.Value;
-                    TimeSpan span4 = (TimeSpan) (DateTime.UtcNow - time);
-                    defaultValue = span4 > new TimeSpan(UpdateCheckIntervalDays, 0, 0, 0);
+                    TimeSpan span5 = (TimeSpan) (DateTime.UtcNow - time);
+                    defaultValue = span5 >= span4;
                 }
                 catch (Exception)
                 {
@@ -133,19 +144,7 @@
             return defaultValue;
         }
 
-        public static int MinBuildAgeForUpdateChecking
-        {
-            get
-            {
-                if (PdnInfo.IsFinalBuild)
-                {
-                    return 7;
-                }
-                return 0;
-            }
-        }
-
-        public static int UpdateCheckIntervalDays
+        private static int NormalUpdateCheckIntervalDays
         {
             get
             {

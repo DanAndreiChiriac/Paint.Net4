@@ -4,7 +4,7 @@
     <ProjectType>local</ProjectType>
     <ProjectVersion>7.10.377</ProjectVersion>
     <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>c5aba898-e85a-4859-a6ae-ba873e46c03f</ProjectGuid>
+    <ProjectGuid>ef519b1b-fad6-4750-a137-4d7e22e21d1e</ProjectGuid>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <AssemblyName>PaintDotNet</AssemblyName>
     <OutputType>WinExe</OutputType>
@@ -33,8 +33,8 @@
   <ItemGroup>
     <Reference Include="PaintDotNet.Base" />
     <Reference Include="System.Windows.Forms" />
-    <Reference Include="System.Drawing" />
     <Reference Include="PaintDotNet.Core" />
+    <Reference Include="System.Drawing" />
     <Reference Include="PaintDotNet.SystemLayer" />
     <Reference Include="PaintDotNet.Data" />
     <Reference Include="System" />
@@ -314,6 +314,7 @@
     <Compile Include="PaintDotNet\Tools\CloneStamp\CloneStampToolChanges.cs" />
     <Compile Include="PaintDotNet\Tools\CloneStamp\CloneStampToolContentRenderer.cs" />
     <Compile Include="PaintDotNet\Tools\CloneStamp\CloneStampToolUI.cs" />
+    <Compile Include="PaintDotNet\Threading\Tasks\TaskManagerUtil.cs" />
     <Compile Include="PaintDotNet\Shapes\CachedGeometry.cs" />
     <Compile Include="PaintDotNet\Shapes\PdnGeometryShapeBase.cs" />
     <Compile Include="PaintDotNet\Shapes\PdnShapeBase.cs" />
@@ -438,8 +439,8 @@
     <Compile Include="PaintDotNet\Settings\Converters\StringSettingConverter.cs" />
     <Compile Include="PaintDotNet\Settings\Converters\TypeSettingConverter.cs" />
     <Compile Include="PaintDotNet\Settings\App\AppErrorFlags.cs" />
-    <Compile Include="PaintDotNet\Settings\App\ToolSettings.cs" />
     <Compile Include="PaintDotNet\Settings\App\AppSettings.cs" />
+    <Compile Include="PaintDotNet\Settings\App\ToolSettings.cs" />
     <Compile Include="PaintDotNet\Settings\App\AppSettingsToolsSectionExtensions.cs" />
     <Compile Include="PaintDotNet\Rendering\BitVector2DToAlpha8Renderer!1.cs" />
     <Compile Include="PaintDotNet\Rendering\CancellableMaskedRendererBgraBase.cs" />

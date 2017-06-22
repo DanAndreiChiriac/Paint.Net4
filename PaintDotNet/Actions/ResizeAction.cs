@@ -277,18 +277,18 @@
                                 if (renderEx != null)
                                 {
                                     DisposableUtil.Free<Surface>(ref newSurface);
-                                    goto Label_022D;
+                                    goto Label_022C;
                                 }
                                 BitmapLayer layer2 = new BitmapLayer(newSurface, true);
                                 layer2.LoadProperties(layer.SaveProperties());
-                                newDocument.Layers.Add(layer2);
+                                newDocument.Layers.Add((Layer) layer2);
                             }
                         }
                         finally
                         {
                             mementos.Add(task2.Result);
                         }
-                    Label_022D:
+                    Label_022C:
                         if (renderEx != null)
                         {
                             DisposableUtil.Free<Document>(ref newDocument);

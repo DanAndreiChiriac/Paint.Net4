@@ -268,9 +268,9 @@
                 {
                     this.MirrorX(surface);
                 }
-                Document document = new Document(surface.Width, surface.Height);
-                document.Layers.Add(layer);
-                document2 = document;
+                document2 = new Document(surface.Width, surface.Height) {
+                    Layers = { (Layer) layer }
+                };
             }
             catch
             {

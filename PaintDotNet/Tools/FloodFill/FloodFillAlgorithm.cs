@@ -4,56 +4,59 @@
     using PaintDotNet.Collections;
     using PaintDotNet.Diagnostics;
     using PaintDotNet.Rendering;
+    using PaintDotNet.Threading;
     using System;
     using System.Collections.Generic;
     using System.Runtime.InteropServices;
+    using System.Threading;
 
     internal static class FloodFillAlgorithm
     {
         public static bool CheckColor(ColorBgra start, ColorBgra checkMe, byte maxDistance) => 
             (GetDistance(start, checkMe) <= maxDistance);
 
-        public static unsafe void FillStencilByColor<TBitVector2D>(IRenderer<ColorBgra> sampleSource, TBitVector2D stencilBuffer, ColorBgra basis, byte tolerance, Func<bool> isCancellationRequestedFn, RectInt32 clipRect) where TBitVector2D: IBitVector2D
+        public static unsafe void FillStencilByColor<TBitVector2D>(IRenderer<ColorBgra> sampleSource, TBitVector2D stencilBuffer, ColorBgra basis, byte tolerance, ICancellationToken cancelToken, RectInt32 clipRect) where TBitVector2D: IBitVector2D
         {
-            if (!isCancellationRequestedFn())
+            cancelToken.ThrowIfCancellationRequested<ICancellationToken>();
+            int left = clipRect.Left;
+            int top = clipRect.Top;
+            int right = clipRect.Right;
+            int bottom = clipRect.Bottom;
+            using (ISurface<ColorBgra> surface = sampleSource.UseTileOrToSurface(clipRect))
             {
-                int left = clipRect.Left;
-                int top = clipRect.Top;
-                int right = clipRect.Right;
-                int bottom = clipRect.Bottom;
-                using (ISurface<ColorBgra> surface = sampleSource.UseTileOrToSurface(clipRect))
+                for (int i = top; i < bottom; i++)
                 {
-                    for (int i = top; i < bottom; i++)
+                    cancelToken.ThrowIfCancellationRequested<ICancellationToken>();
+                    int row = i - clipRect.Top;
+                    ColorBgra* rowPointer = (ColorBgra*) surface.GetRowPointer<ColorBgra>(row);
+                    for (int j = left; j < right; j++)
                     {
-                        if (isCancellationRequestedFn())
+                        bool flag;
+                        ColorBgra b = rowPointer[0];
+                        if (b == basis)
                         {
-                            return;
+                            flag = true;
                         }
-                        int row = i - clipRect.Top;
-                        ColorBgra* rowPointer = (ColorBgra*) surface.GetRowPointer<ColorBgra>(row);
-                        for (int j = left; j < right; j++)
+                        else
                         {
-                            bool flag;
-                            ColorBgra b = rowPointer[0];
-                            if (b == basis)
-                            {
-                                flag = true;
-                            }
-                            else
-                            {
-                                flag = GetDistance(basis, b) <= tolerance;
-                            }
-                            stencilBuffer.SetUnchecked(j, i, flag);
-                            rowPointer++;
+                            flag = GetDistance(basis, b) <= tolerance;
                         }
+                        stencilBuffer.SetUnchecked(j, i, flag);
+                        rowPointer++;
                     }
                 }
             }
         }
 
-        public static unsafe void FillStencilFromPoint<TBitVector2D>(IRenderer<ColorBgra> sampleSource, TBitVector2D stencilBuffer, PointInt32 startPt, byte tolerance, Func<bool> isCancellationRequestedFn, out RectInt32 bounds) where TBitVector2D: IBitVector2D
+        public static void FillStencilByColor<TBitVector2D>(IRenderer<ColorBgra> sampleSource, TBitVector2D stencilBuffer, ColorBgra basis, byte tolerance, CancellationToken cancelToken, RectInt32 clipRect) where TBitVector2D: IBitVector2D
         {
-            Validate.IsNotNull<IRenderer<ColorBgra>>(sampleSource, "sampleSource");
+            FillStencilByColor<TBitVector2D>(sampleSource, stencilBuffer, basis, tolerance, CancellationTokenUtil.Create(cancelToken), clipRect);
+        }
+
+        public static unsafe void FillStencilFromPoint<TBitVector2D>(IRenderer<ColorBgra> sampleSource, TBitVector2D stencilBuffer, PointInt32 startPt, byte tolerance, ICancellationToken cancelToken, out RectInt32 bounds) where TBitVector2D: IBitVector2D
+        {
+            Validate.Begin().IsNotNull<IRenderer<ColorBgra>>(sampleSource, "sampleSource").IsNotNull<ICancellationToken>(cancelToken, "cancelToken").Check();
+            cancelToken.ThrowIfCancellationRequested<ICancellationToken>();
             int width = sampleSource.Width;
             int height = sampleSource.Height;
             if ((width > stencilBuffer.Width) || (height > stencilBuffer.Height))
@@ -82,11 +85,7 @@
                     ColorBgra start = *((ColorBgra*) (((void*) cache.GetRow(startPt.Y)) + (startPt.X * sizeof(ColorBgra))));
                     while (queue.Any<PointInt32>())
                     {
-                        if (isCancellationRequestedFn())
-                        {
-                            bounds = RectInt32.Empty;
-                            return;
-                        }
+                        cancelToken.ThrowIfCancellationRequested<ICancellationToken>();
                         PointInt32 pt = queue.Dequeue();
                         try
                         {
@@ -212,6 +211,11 @@
                     bounds = RectInt32.FromEdges(num5, num6, num7, num8);
                 }
             }
+        }
+
+        public static void FillStencilFromPoint<TBitVector2D>(IRenderer<ColorBgra> sampleSource, TBitVector2D stencilBuffer, PointInt32 startPt, byte tolerance, CancellationToken cancelToken, out RectInt32 bounds) where TBitVector2D: IBitVector2D
+        {
+            FillStencilFromPoint<TBitVector2D>(sampleSource, stencilBuffer, startPt, tolerance, CancellationTokenUtil.Create(cancelToken), out bounds);
         }
 
         public static byte GetDistance(ColorBgra a, ColorBgra b)

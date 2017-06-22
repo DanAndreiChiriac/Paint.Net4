@@ -1,6 +1,7 @@
 ﻿namespace PaintDotNet.Updates
 {
     using PaintDotNet;
+    using PaintDotNet.Dialogs;
     using PaintDotNet.Settings.App;
     using PaintDotNet.SystemLayer;
     using System;
@@ -50,14 +51,21 @@
                             parent.FormBorderStyle = FormBorderStyle.None;
                             parent.StartPosition = FormStartPosition.CenterScreen;
                             parent.Show();
-                            ShellUtil.Execute(parent, this.installerPath, "/skipConfig /restartPdnOnExit", ExecutePrivilege.RequireAdmin, ExecuteWaitType.ReturnImmediately);
+                            try
+                            {
+                                ShellUtil.Execute(parent, this.installerPath, "/skipConfig /restartPdnOnExit", ExecutePrivilege.RequireAdmin, ExecuteWaitType.ReturnImmediately);
+                            }
+                            catch (Exception exception)
+                            {
+                                ExceptionDialog.ShowErrorDialog(parent, exception);
+                            }
                             parent.Close();
                             Startup.CloseApplication();
                         }
                     }
                     else
                     {
-                        bool flag3 = FileSystem.TryDeleteFile(this.installerPath);
+                        FileSystem.TryDeleteFile(this.installerPath);
                     }
                 }
                 finally

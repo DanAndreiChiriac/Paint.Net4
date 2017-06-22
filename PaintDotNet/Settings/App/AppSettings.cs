@@ -13,6 +13,7 @@
     using PaintDotNet.Shapes.Lines;
     using PaintDotNet.Snap;
     using PaintDotNet.SystemLayer;
+    using PaintDotNet.Threading;
     using PaintDotNet.Tools;
     using PaintDotNet.Tools.Recolor;
     using PaintDotNet.Tools.Shapes;
@@ -30,6 +31,7 @@
     {
         public readonly EffectsSection Effects;
         public readonly FileSection File;
+        public readonly PerformanceSection Performance;
         private static AppSettings publicNullInstance;
         private static readonly AppSettings publicRegistryInstance = new AppSettings(RegistryStorageHandler.Instance);
         public readonly ToolsSection ToolDefaults;
@@ -42,6 +44,7 @@
         {
             this.Effects = base.RegisterSectionDuringCtor<EffectsSection>(new EffectsSection());
             this.File = base.RegisterSectionDuringCtor<FileSection>(new FileSection());
+            this.Performance = base.RegisterSectionDuringCtor<PerformanceSection>(new PerformanceSection());
             this.ToolDefaults = base.RegisterSectionDuringCtor<ToolsSection>(new ToolsSection("ToolDefaults"));
             this.UI = base.RegisterSectionDuringCtor<UISection>(new UISection());
             this.Updates = base.RegisterSectionDuringCtor<UpdatesSection>(new UpdatesSection());
@@ -107,6 +110,16 @@
 
                 public int MaxCount =>
                     8;
+            }
+        }
+
+        public sealed class PerformanceSection : SettingsSection
+        {
+            public readonly EnumSetting<PaintDotNet.Threading.ThreadUtilizationPolicy> ThreadUtilizationPolicy;
+
+            public PerformanceSection() : base("Performance")
+            {
+                this.ThreadUtilizationPolicy = base.Register<EnumSetting<PaintDotNet.Threading.ThreadUtilizationPolicy>>(new EnumSetting<PaintDotNet.Threading.ThreadUtilizationPolicy>(base.GetSettingPath("ThreadUtilizationPolicy"), SettingScope.CurrentUserWithSystemWideOverride, PaintDotNet.Threading.ThreadUtilizationPolicy.MinPhysicalMaxAllCores));
             }
         }
 

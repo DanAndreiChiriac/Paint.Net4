@@ -3,14 +3,18 @@
     using PaintDotNet;
     using System;
 
-    internal class ReplaceDocumentHistoryMemento : HistoryMemento
+    internal sealed class ReplaceDocumentHistoryMemento : HistoryMemento
     {
         private IHistoryWorkspace historyWorkspace;
 
-        public ReplaceDocumentHistoryMemento(string name, ImageResource image, IHistoryWorkspace historyWorkspace) : base(name, image)
+        public ReplaceDocumentHistoryMemento(string name, ImageResource image, IHistoryWorkspace historyWorkspace) : this(name, image, historyWorkspace, historyWorkspace.Document)
+        {
+        }
+
+        public ReplaceDocumentHistoryMemento(string name, ImageResource image, IHistoryWorkspace historyWorkspace, Document document) : base(name, image)
         {
             this.historyWorkspace = historyWorkspace;
-            ReplaceDocumentHistoryMementoData data = new ReplaceDocumentHistoryMementoData(this.historyWorkspace.Document);
+            ReplaceDocumentHistoryMementoData data = new ReplaceDocumentHistoryMementoData(document);
             base.Data = data;
         }
 

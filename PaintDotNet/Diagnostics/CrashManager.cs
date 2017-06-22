@@ -49,8 +49,17 @@
                 string str2 = PdnResources.GetString("CrashLogDialog.MayBeCausedBy.MirillisAction");
                 return string.Format(format, str2);
             }
+            if (IsCrashCausedByEvgaPrecisionX(crashLogText))
+            {
+                string str4 = PdnResources.GetString("CrashLogDialog.Message.MayBeCausedBy.DisableOrRemove.Format");
+                string str5 = PdnResources.GetString("CrashLogDialog.MayBeCausedBy.EVGAPrecisionX");
+                return string.Format(str4, str5);
+            }
             return string.Empty;
         }
+
+        private static bool IsCrashCausedByEvgaPrecisionX(string crashLogText) => 
+            ((crashLogText.Contains("System.AccessViolationException") || crashLogText.Contains("System.OutOfMemoryException")) && (crashLogText.Contains("D2DRenderTarget.EndDraw") && (crashLogText.Contains(@"EVGA\Precision XOC\PXSHW10_x64.dll") || crashLogText.Contains("PrecisionXServerHooks_x64.dll"))));
 
         private static bool IsCrashCausedByMirillisAction(string crashLogText) => 
             ((crashLogText.Contains("System.AccessViolationException") || crashLogText.Contains("PaintDotNet.Direct2D.RecreateTargetException")) && (crashLogText.Contains(@"\Mirillis\Action!\action_x64.dll,") || crashLogText.Contains(@"\ActionRecorder\action_x64.dll,")));
@@ -170,52 +179,52 @@
         private sealed class <>c
         {
             public static readonly CrashManager.<>c <>9 = new CrashManager.<>c();
-            public static Func<string, DateTime> <>9__10_0;
-            public static Func<string, <>f__AnonymousType0<string, string>> <>9__10_1;
-            public static Func<<>f__AnonymousType0<string, string>, <>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>> <>9__10_2;
-            public static Func<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, <>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>> <>9__10_3;
-            public static Func<<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>, <>f__AnonymousType3<<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>, long>> <>9__10_4;
-            public static Func<<>f__AnonymousType3<<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>, long>, <>f__AnonymousType4<string, long>> <>9__10_5;
-            public static Func<<>f__AnonymousType4<string, long>, long> <>9__10_6;
-            public static Func<<>f__AnonymousType4<string, long>, string> <>9__10_7;
+            public static Func<string, DateTime> <>9__11_0;
+            public static Func<string, <>f__AnonymousType0<string, string>> <>9__11_1;
+            public static Func<<>f__AnonymousType0<string, string>, <>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>> <>9__11_2;
+            public static Func<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, <>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>> <>9__11_3;
+            public static Func<<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>, <>f__AnonymousType3<<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>, long>> <>9__11_4;
+            public static Func<<>f__AnonymousType3<<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>, long>, <>f__AnonymousType4<string, long>> <>9__11_5;
+            public static Func<<>f__AnonymousType4<string, long>, long> <>9__11_6;
+            public static Func<<>f__AnonymousType4<string, long>, string> <>9__11_7;
 
-            internal DateTime <SaveCrashLog>b__10_0(string filePath) => 
+            internal DateTime <SaveCrashLog>b__11_0(string filePath) => 
                 File.GetCreationTimeUtc(filePath);
 
-            internal <>f__AnonymousType0<string, string> <SaveCrashLog>b__10_1(string filePath) => 
+            internal <>f__AnonymousType0<string, string> <SaveCrashLog>b__11_1(string filePath) => 
                 new { 
                     filePath = filePath,
                     fileName = Path.GetFileName(filePath)
                 };
 
-            internal <>f__AnonymousType1<<>f__AnonymousType0<string, string>, string> <SaveCrashLog>b__10_2(<>f__AnonymousType0<string, string> <>h__TransparentIdentifier0) => 
+            internal <>f__AnonymousType1<<>f__AnonymousType0<string, string>, string> <SaveCrashLog>b__11_2(<>f__AnonymousType0<string, string> <>h__TransparentIdentifier0) => 
                 new { 
                     <>h__TransparentIdentifier0 = <>h__TransparentIdentifier0,
                     fileNameNoExt = Path.ChangeExtension(<>h__TransparentIdentifier0.fileName, null)
                 };
 
-            internal <>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string> <SaveCrashLog>b__10_3(<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string> <>h__TransparentIdentifier1) => 
+            internal <>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string> <SaveCrashLog>b__11_3(<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string> <>h__TransparentIdentifier1) => 
                 new { 
                     <>h__TransparentIdentifier1 = <>h__TransparentIdentifier1,
                     ordinalStr = <>h__TransparentIdentifier1.fileNameNoExt.Substring("pdncrash.".Length)
                 };
 
-            internal <>f__AnonymousType3<<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>, long> <SaveCrashLog>b__10_4(<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string> <>h__TransparentIdentifier2) => 
+            internal <>f__AnonymousType3<<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>, long> <SaveCrashLog>b__11_4(<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string> <>h__TransparentIdentifier2) => 
                 new { 
                     <>h__TransparentIdentifier2 = <>h__TransparentIdentifier2,
                     ordinal = long.Parse(<>h__TransparentIdentifier2.ordinalStr)
                 };
 
-            internal <>f__AnonymousType4<string, long> <SaveCrashLog>b__10_5(<>f__AnonymousType3<<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>, long> <>h__TransparentIdentifier3) => 
+            internal <>f__AnonymousType4<string, long> <SaveCrashLog>b__11_5(<>f__AnonymousType3<<>f__AnonymousType2<<>f__AnonymousType1<<>f__AnonymousType0<string, string>, string>, string>, long> <>h__TransparentIdentifier3) => 
                 new { 
                     FilePath = <>h__TransparentIdentifier3.<>h__TransparentIdentifier2.<>h__TransparentIdentifier1.<>h__TransparentIdentifier0.filePath,
                     Ordinal = <>h__TransparentIdentifier3.ordinal
                 };
 
-            internal long <SaveCrashLog>b__10_6(<>f__AnonymousType4<string, long> filePathAndOrdinal) => 
+            internal long <SaveCrashLog>b__11_6(<>f__AnonymousType4<string, long> filePathAndOrdinal) => 
                 filePathAndOrdinal.Ordinal;
 
-            internal string <SaveCrashLog>b__10_7(<>f__AnonymousType4<string, long> p) => 
+            internal string <SaveCrashLog>b__11_7(<>f__AnonymousType4<string, long> p) => 
                 p.FilePath;
         }
     }

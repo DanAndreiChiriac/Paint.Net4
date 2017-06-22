@@ -29,7 +29,7 @@
 
         static BrushToolChangesBase()
         {
-            BrushToolChangesBase<TDerived, TTool>.stampCache = new WeakCache<TupleStruct<double, double, double, bool>, CircleBrushStamp>(new Func<TupleStruct<double, double, double, bool>, CircleBrushStamp>(<>c<TDerived, TTool>.<>9.<.cctor>b__34_0));
+            BrushToolChangesBase<TDerived, TTool>.stampCache = new WeakCache<TupleStruct<double, double, double, bool>, CircleBrushStamp>(new Func<TupleStruct<double, double, double, bool>, CircleBrushStamp>(<>c<TDerived, TTool>.<>9.<.cctor>b__35_0));
         }
 
         protected BrushToolChangesBase(IEnumerable<KeyValuePair<string, object>> drawingSettingsValues, IEnumerable<BrushInputPoint> inputPoints) : base(drawingSettingsValues)
@@ -65,18 +65,29 @@
             }
         }
 
+        private static CircleBrushStamp GetCachedStamp(double diameter, double hardness, double opacity, bool isAntialiased) => 
+            BrushToolChangesBase<TDerived, TTool>.stampCache.Get(TupleStruct.Create<double, double, double, bool>(diameter, hardness, opacity, isAntialiased));
+
         protected void Initialize()
         {
+            double num;
             this.OnInitializing();
-            this.stamp = BrushToolChangesBase<TDerived, TTool>.stampCache.Get(TupleStruct.Create<double, double, double, bool>((double) this.PenWidth, (double) this.Hardness, 1.0, this.Antialiasing));
-            double num = this.PenWidth * 0.15;
+            this.stamp = BrushToolChangesBase<TDerived, TTool>.GetCachedStamp((double) this.PenWidth, (double) this.Hardness, 1.0, this.Antialiasing);
+            if (this.Antialiasing)
+            {
+                num = this.PenWidth * 0.15;
+            }
+            else
+            {
+                num = 1.0;
+            }
             double stampSpacingPx = Math.Max(1.0, num);
             BrushStrokeLengthMetric lengthMetric = this.Antialiasing ? BrushStrokeLengthMetric.Euclidean : BrushStrokeLengthMetric.Anamorphic;
-            this.renderData = new BrushStrokeRenderData(this.stamp.Size, stampSpacingPx, 7, lengthMetric);
+            this.renderData = new BrushStrokeRenderData(this.stamp.Size, stampSpacingPx, 8, lengthMetric);
             this.renderData.AddInputPoints(this.InputPoints);
             this.renderData.EnsureStrokeSamplesUpdated();
             this.renderDataCurrencyToken = this.renderData.CreateCurrencyToken();
-            this.renderCache = new BrushStrokeRenderCache(this.renderData, this.stamp, 7);
+            this.renderCache = new BrushStrokeRenderCache(this.renderData, this.stamp, this.renderData.TileEdgeLog2);
             this.OnInitialized();
         }
 
@@ -160,7 +171,7 @@
                 BrushToolChangesBase<TDerived, TTool>.<>c.<>9 = new BrushToolChangesBase<TDerived, TTool>.<>c();
             }
 
-            internal CircleBrushStamp <.cctor>b__34_0(TupleStruct<double, double, double, bool> tup) => 
+            internal CircleBrushStamp <.cctor>b__35_0(TupleStruct<double, double, double, bool> tup) => 
                 new CircleBrushStamp(tup.Item1, tup.Item2, tup.Item3, tup.Item4);
         }
     }

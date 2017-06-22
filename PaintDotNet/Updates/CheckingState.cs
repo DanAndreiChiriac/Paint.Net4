@@ -365,7 +365,7 @@
         {
             get
             {
-                Uri baseUri = new Uri("http://www.getpaint.net");
+                Uri baseUri = new Uri("https://www.getpaint.net");
                 if (PdnInfo.IsTestMode)
                 {
                     Uri uri2 = new Uri(baseUri, versionManifestTestRelativeUrl);

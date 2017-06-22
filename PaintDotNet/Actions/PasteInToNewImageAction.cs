@@ -21,7 +21,7 @@
                 {
                     SizeInt32? nullable;
                     IPdnDataObject dataObject;
-                    MaskedSurface clipboardImage;
+                    MaskedSurface surface;
                     try
                     {
                         using (new WaitCursorChanger(appWorkspace))
@@ -30,10 +30,10 @@
                             dataObject = PdnClipboard.GetDataObject();
                             if (ClipboardUtil.IsClipboardImageMaybeAvailable(appWorkspace, dataObject))
                             {
-                                clipboardImage = ClipboardUtil.GetClipboardImage(appWorkspace, dataObject);
-                                if (clipboardImage != null)
+                                surface = ClipboardUtil.TryGetClipboardImage(appWorkspace, dataObject);
+                                if (surface != null)
                                 {
-                                    nullable = new SizeInt32?(clipboardImage.GetCachedGeometryMaskScansBounds().Size);
+                                    nullable = new SizeInt32?(surface.GetCachedGeometryMaskScansBounds().Size);
                                 }
                                 else
                                 {
@@ -42,7 +42,7 @@
                             }
                             else
                             {
-                                clipboardImage = null;
+                                surface = null;
                                 nullable = null;
                             }
                         }
@@ -80,7 +80,7 @@
                             DocumentWorkspace documentWorkspace = appWorkspace.AddNewDocumentWorkspace();
                             documentWorkspace.Document = document;
                             documentWorkspace.History.PushNewMemento(new NullHistoryMemento(string.Empty, null));
-                            PasteInToNewLayerAction action = new PasteInToNewLayerAction(documentWorkspace, dataObject, clipboardImage);
+                            PasteInToNewLayerAction action = new PasteInToNewLayerAction(documentWorkspace, dataObject, surface);
                             if (action.PerformAction())
                             {
                                 using (new PushNullToolMode(documentWorkspace))

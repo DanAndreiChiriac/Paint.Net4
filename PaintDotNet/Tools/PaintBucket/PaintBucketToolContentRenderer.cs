@@ -39,15 +39,11 @@
             {
                 return new FillRendererAlpha8(this.sampleSource.Width, this.sampleSource.Height, ColorAlpha8.Transparent);
             }
-            Func<bool> isCancellationRequestedFn = () => base.IsCancellationRequested;
             ColorBgra pointSlow = this.sampleSource.GetPointSlow(pt);
-            if (base.IsCancellationRequested)
-            {
-                return null;
-            }
+            base.ThrowIfCancellationRequested();
             if (this.changes.FloodMode == FloodMode.Global)
             {
-                renderer = new FillStencilByColorRenderer(this.sampleSource, pointSlow, tolerance, isCancellationRequestedFn);
+                renderer = new FillStencilByColorRenderer(this.sampleSource, pointSlow, tolerance, this);
             }
             else
             {
@@ -55,38 +51,23 @@
                 BitVector2D source = new BitVector2D(this.sampleSource.Width, this.sampleSource.Height);
                 BitVector2DStruct stencilBuffer = new BitVector2DStruct(source);
                 source.Clear(true);
-                if (base.IsCancellationRequested)
-                {
-                    return null;
-                }
+                base.ThrowIfCancellationRequested();
                 foreach (RectInt32 num6 in this.changes.ClippingMask.EnumerateInteriorScans())
                 {
                     source.Set(num6, false);
-                    if (base.IsCancellationRequested)
-                    {
-                        return null;
-                    }
+                    base.ThrowIfCancellationRequested();
                 }
                 BitVector2D other = source.Clone();
-                if (base.IsCancellationRequested)
-                {
-                    return null;
-                }
-                FloodFillAlgorithm.FillStencilFromPoint<BitVector2DStruct>(this.sampleSource, stencilBuffer, pt, tolerance, isCancellationRequestedFn, out num5);
-                if (base.IsCancellationRequested)
-                {
-                    return null;
-                }
+                base.ThrowIfCancellationRequested();
+                FloodFillAlgorithm.FillStencilFromPoint<BitVector2DStruct>(this.sampleSource, stencilBuffer, pt, tolerance, this, out num5);
+                base.ThrowIfCancellationRequested();
                 source.Xor(other);
-                if (base.IsCancellationRequested)
-                {
-                    return null;
-                }
+                base.ThrowIfCancellationRequested();
                 renderer = new BitVector2DToAlpha8Renderer<BitVector2DStruct>(stencilBuffer);
             }
             if (this.changes.Antialiasing)
             {
-                return new FeatheredMaskRenderer(this.sampleSource, pointSlow, renderer, tolerance, isCancellationRequestedFn);
+                return new FeatheredMaskRenderer(this.sampleSource, pointSlow, renderer, tolerance, this);
             }
             return renderer;
         }
@@ -94,7 +75,7 @@
         protected override void OnRender(ISurface<ColorBgra> dstContent, ISurface<ColorAlpha8> dstMask, PointInt32 renderOffset)
         {
             base.ThrowIfCancellationRequested();
-            IRenderer<ColorAlpha8> renderer = this.lazyStencil.Value;
+            IRenderer<ColorAlpha8> renderer = this.lazyStencil.CancelableValue<IRenderer<ColorAlpha8>>();
             base.ThrowIfCancellationRequested();
             if (renderer == null)
             {

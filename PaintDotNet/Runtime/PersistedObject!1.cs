@@ -45,7 +45,7 @@
             this.bstrTempFileName = Marshal.StringToBSTR(this.tempFileName);
             if (background)
             {
-                ThreadPool.UnsafeQueueUserWorkItem(new WaitCallback(this.PersistToDiskThread), theObject);
+                ThreadPool.UnsafeQueueUserWorkItem(new WaitCallback(this.PersistToDisk), theObject);
             }
             else
             {
@@ -156,11 +156,6 @@
                 }
                 GC.KeepAlive(theObject);
             }
-        }
-
-        private void PersistToDiskThread(object theObject)
-        {
-            this.PersistToDisk(theObject);
         }
 
         private void WaitForObjectSaved()

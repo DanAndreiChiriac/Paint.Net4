@@ -530,15 +530,15 @@
                                         linear = BitmapInterpolationMode.Fant;
                                     }
                                     IImagingFactory instance = ImagingFactory.Instance;
-                                    Func<bool> pollIsCancelledCallback = () => isCancelled | this.IsTileRenderingCancelled(tileOffset);
+                                    ICancellationToken cancelToken = CancellationTokenUtil.Create((Func<bool>) (() => (isCancelled | this.IsTileRenderingCancelled(tileOffset))));
                                     int copyHeightLog2 = Math.Max(3, 7 - this.mipLevel);
                                     using (ClippedBitmapSource<ColorBgra32> source2 = new ClippedBitmapSource<ColorBgra32>(this.source, tileSourceRect))
                                     {
-                                        using (CancellableBitmapSource<ColorBgra32> source3 = new CancellableBitmapSource<ColorBgra32>(source2, r => this.tileMathHelper.EnumerateTilesClippedToSourceRect(r), null, pollIsCancelledCallback))
+                                        using (CancellableBitmapSource<ColorBgra32> source3 = new CancellableBitmapSource<ColorBgra32>(source2, r => this.tileMathHelper.EnumerateTilesClippedToSourceRect(r), null, cancelToken))
                                         {
                                             using (IBitmapSource<ColorPbgra32> source4 = CreateBufferedTileScaler(instance, source3, tileBufferSize.Width, tileBufferSize.Height, linear))
                                             {
-                                                using (CancellableBitmapSource<ColorPbgra32> source5 = new CancellableBitmapSource<ColorPbgra32>(source4, r => TileRectSplitter(r, ((int) 1) << copyHeightLog2), null, pollIsCancelledCallback))
+                                                using (CancellableBitmapSource<ColorPbgra32> source5 = new CancellableBitmapSource<ColorPbgra32>(source4, r => TileRectSplitter(r, ((int) 1) << copyHeightLog2), null, cancelToken))
                                                 {
                                                     try
                                                     {

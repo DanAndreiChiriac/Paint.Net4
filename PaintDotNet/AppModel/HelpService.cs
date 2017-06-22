@@ -10,7 +10,7 @@
 
         public void ShowHelp(IWin32Window owner)
         {
-            string str = "http://www.getpaint.net";
+            string str = "https://www.getpaint.net";
             string format = "{0}/doc/latest/index.html";
             string url = string.Format(format, str);
             PdnInfo.OpenUrl2(owner, url);

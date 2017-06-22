@@ -226,14 +226,14 @@
                     LogicalProcessorInfo logicalProcessorInformation = Processor.GetLogicalProcessorInformation();
                     int num6 = logicalProcessorInformation.Packages.Count;
                     int physicalCoreCount = logicalProcessorInformation.GetPhysicalCoreCount();
-                    int logicalCpuCount = Processor.LogicalCpuCount;
+                    int logicalCoreCount = logicalProcessorInformation.GetLogicalCoreCount();
                     if (num6 > 1)
                     {
-                        str19 = $"{num6.ToString()}S/{physicalCoreCount.ToString()}C/{logicalCpuCount.ToString()}T";
+                        str19 = $"{num6.ToString()}S/{physicalCoreCount.ToString()}C/{logicalCoreCount.ToString()}T";
                     }
                     else
                     {
-                        str19 = $"{physicalCoreCount.ToString()}C/{logicalCpuCount.ToString()}T";
+                        str19 = $"{physicalCoreCount.ToString()}C/{logicalCoreCount.ToString()}T";
                     }
                 }
                 catch (Exception exception18)

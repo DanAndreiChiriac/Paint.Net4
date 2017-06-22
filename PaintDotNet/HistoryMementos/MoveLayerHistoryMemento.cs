@@ -3,7 +3,7 @@
     using PaintDotNet;
     using System;
 
-    internal class MoveLayerHistoryMemento : HistoryMemento
+    internal sealed class MoveLayerHistoryMemento : HistoryMemento
     {
         private IHistoryWorkspace historyWorkspace;
         private int newIndex;

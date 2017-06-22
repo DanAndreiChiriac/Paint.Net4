@@ -104,8 +104,8 @@
             if (input.Length == 0)
             {
                 Document document = new Document(800, 600);
-                Layer layer = Layer.CreateBackgroundLayer(document.Width, document.Height);
-                document.Layers.Add(layer);
+                Layer item = Layer.CreateBackgroundLayer(document.Width, document.Height);
+                document.Layers.Add(item);
                 return document;
             }
             using (Image image = Image.FromStream(input, false, true))

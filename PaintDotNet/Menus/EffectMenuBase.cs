@@ -46,7 +46,7 @@
         private readonly int renderingThreadCount = Math.Max(2, WorkItemDispatcher.Default.MaxThreadCount);
         private PdnMenuItem sentinel;
         private bool showProgressInStatusBar;
-        private const int tilesPerCpu = 0x19;
+        internal const int tilesPerCpu = 0x19;
 
         public EffectMenuBase()
         {

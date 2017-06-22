@@ -184,7 +184,7 @@
             return task;
         }
 
-        [IteratorStateMachine(typeof(<AddToMruListTask>d__228))]
+        [IteratorStateMachine(typeof(<AddToMruListTask>d__229))]
         public IEnumerator<Directive> AddToMruListTask()
         {
             this.<fullFileName>5__3 = Path.GetFullPath(this.FilePath);
@@ -876,66 +876,6 @@
             selectionInfoImage = this.latestSelectionInfoImage;
         }
 
-        private unsafe System.Drawing.Bitmap GetLivePreviewBitmap()
-        {
-            System.Drawing.Bitmap bitmap;
-            try
-            {
-                bitmap = new System.Drawing.Bitmap(base.Width, base.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-            CanvasView canvasView = new CanvasView {
-                CanvasExtentPadding = base.CanvasView.CanvasExtentPadding,
-                ScaleRatio = base.CanvasView.ScaleRatio,
-                ViewportCanvasOffset = base.CanvasView.ViewportCanvasOffset,
-                ViewportSize = base.CanvasView.ViewportSize
-            };
-            DocumentCanvasLayer.SetIsHighQualityScalingEnabled(canvasView, DocumentCanvasLayer.GetIsHighQualityScalingEnabled(base.CanvasView));
-            SelectionCanvasLayer.SetIsAntialiasedOutlineEnabled(canvasView, SelectionCanvasLayer.GetIsAntialiasedOutlineEnabled(base.CanvasView));
-            SelectionCanvasLayer.SetIsAnimatedOutlineEnabled(canvasView, SelectionCanvasLayer.GetIsAnimatedOutlineEnabled(base.CanvasView));
-            PixelGridCanvasLayer.SetIsPixelGridEnabled(canvasView, PixelGridCanvasLayer.GetIsPixelGridEnabled(base.CanvasView));
-            canvasView.Canvas = base.DocumentCanvas;
-            canvasView.IsVisible = true;
-            BitmapData bitmapdata = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
-            try
-            {
-                using (SharedBitmap bitmap3 = new SharedBitmap(bitmap, bitmap.Width, bitmap.Height, PixelFormats.Bgr32, bitmapdata.Scan0, bitmapdata.Stride, 96.0, 96.0))
-                {
-                    using (IRenderTarget target = RenderTarget.FromBitmap(Direct2DFactory.PerThread, bitmap3))
-                    {
-                        using (IDrawingContext context = DrawingContext.FromRenderTarget(target))
-                        {
-                            canvasView.RenderTarget = target;
-                            base.DocumentCanvas.PreRenderSync(canvasView);
-                            RectFloat viewportCanvasBounds = (RectFloat) canvasView.ViewportCanvasBounds;
-                            base.DocumentCanvas.BeforeRender(viewportCanvasBounds, canvasView);
-                            base.DocumentCanvas.Render(context, viewportCanvasBounds, canvasView);
-                            base.DocumentCanvas.AfterRender(viewportCanvasBounds, canvasView);
-                        }
-                    }
-                }
-                for (int i = 0; i < bitmapdata.Height; i++)
-                {
-                    uint* numPtr = (uint*) (bitmapdata.Scan0.ToPointer() + (i * bitmapdata.Stride));
-                    uint* numPtr2 = numPtr + bitmapdata.Width;
-                    while (numPtr < numPtr2)
-                    {
-                        numPtr[0] |= 0xff000000;
-                        numPtr++;
-                    }
-                }
-            }
-            finally
-            {
-                bitmap.UnlockBits(bitmapdata);
-                canvasView.Canvas = null;
-            }
-            return bitmap;
-        }
-
         private bool GetSaveConfigToken(PaintDotNet.FileType currentFileType, PaintDotNet.SaveConfigToken currentSaveConfigToken, out PaintDotNet.SaveConfigToken newSaveConfigToken, Surface saveScratchSurface)
         {
             if (currentFileType.SupportsConfiguration)
@@ -1565,16 +1505,16 @@
 
         private void OnTabbedThumbnailLivePreviewBitmapRequested(object sender, TabbedThumbnailBitmapRequestedEventArgs e)
         {
-            System.Drawing.Bitmap livePreviewBitmap;
+            System.Drawing.Bitmap bitmap;
             try
             {
-                livePreviewBitmap = this.GetLivePreviewBitmap();
+                bitmap = this.TryGetLivePreviewBitmap();
             }
             catch (Exception)
             {
                 return;
             }
-            e.Bitmap = livePreviewBitmap;
+            e.Bitmap = bitmap;
         }
 
         protected void OnToolChanged()
@@ -1975,6 +1915,66 @@
             this.ReevaluateToolPulseTimerEnabled();
         }
 
+        private unsafe System.Drawing.Bitmap TryGetLivePreviewBitmap()
+        {
+            System.Drawing.Bitmap bitmap;
+            try
+            {
+                bitmap = new System.Drawing.Bitmap(base.Width, base.Height, System.Drawing.Imaging.PixelFormat.Format32bppRgb);
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+            CanvasView canvasView = new CanvasView {
+                CanvasExtentPadding = base.CanvasView.CanvasExtentPadding,
+                ScaleRatio = base.CanvasView.ScaleRatio,
+                ViewportCanvasOffset = base.CanvasView.ViewportCanvasOffset,
+                ViewportSize = base.CanvasView.ViewportSize
+            };
+            DocumentCanvasLayer.SetIsHighQualityScalingEnabled(canvasView, DocumentCanvasLayer.GetIsHighQualityScalingEnabled(base.CanvasView));
+            SelectionCanvasLayer.SetIsAntialiasedOutlineEnabled(canvasView, SelectionCanvasLayer.GetIsAntialiasedOutlineEnabled(base.CanvasView));
+            SelectionCanvasLayer.SetIsAnimatedOutlineEnabled(canvasView, SelectionCanvasLayer.GetIsAnimatedOutlineEnabled(base.CanvasView));
+            PixelGridCanvasLayer.SetIsPixelGridEnabled(canvasView, PixelGridCanvasLayer.GetIsPixelGridEnabled(base.CanvasView));
+            canvasView.Canvas = base.DocumentCanvas;
+            canvasView.IsVisible = true;
+            BitmapData bitmapdata = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, bitmap.PixelFormat);
+            try
+            {
+                using (SharedBitmap bitmap3 = new SharedBitmap(bitmap, bitmap.Width, bitmap.Height, PixelFormats.Bgr32, bitmapdata.Scan0, bitmapdata.Stride, 96.0, 96.0))
+                {
+                    using (IRenderTarget target = RenderTarget.FromBitmap(Direct2DFactory.PerThread, bitmap3))
+                    {
+                        using (IDrawingContext context = DrawingContext.FromRenderTarget(target))
+                        {
+                            canvasView.RenderTarget = target;
+                            base.DocumentCanvas.PreRenderSync(canvasView);
+                            RectFloat viewportCanvasBounds = (RectFloat) canvasView.ViewportCanvasBounds;
+                            base.DocumentCanvas.BeforeRender(viewportCanvasBounds, canvasView);
+                            base.DocumentCanvas.Render(context, viewportCanvasBounds, canvasView);
+                            base.DocumentCanvas.AfterRender(viewportCanvasBounds, canvasView);
+                        }
+                    }
+                }
+                for (int i = 0; i < bitmapdata.Height; i++)
+                {
+                    uint* numPtr = (uint*) (bitmapdata.Scan0.ToPointer() + (i * bitmapdata.Stride));
+                    uint* numPtr2 = numPtr + bitmapdata.Width;
+                    while (numPtr < numPtr2)
+                    {
+                        numPtr[0] |= 0xff000000;
+                        numPtr++;
+                    }
+                }
+            }
+            finally
+            {
+                bitmap.UnlockBits(bitmapdata);
+                canvasView.Canvas = null;
+            }
+            return bitmap;
+        }
+
         private void UpdateExifTags(Document document)
         {
             System.Drawing.Imaging.PropertyItem item = Exif.CreateAscii(ExifTagID.Software, PdnInfo.GetInvariantProductName());
@@ -2141,6 +2141,29 @@
                         this.TabbedThumbnail.InvalidatePreview();
                     }
                 }
+            }
+        }
+
+        public void WaitWithProgress(Task task, ImageResource icon, string titleText, string headerText)
+        {
+            TimeSpan span = TimeSpan.FromSeconds(1.0);
+            DateTime now = DateTime.Now;
+            while (DateTime.Now < (now + span))
+            {
+                if (task.State == TaskState.Finished)
+                {
+                    return;
+                }
+                Thread.Sleep(10);
+            }
+            using (TaskProgressDialog dialog = new TaskProgressDialog())
+            {
+                dialog.ShowCancelButton = false;
+                dialog.Task = task;
+                dialog.Icon = icon.Reference.ToIcon();
+                dialog.Text = titleText;
+                dialog.HeaderText = headerText;
+                dialog.ShowDialog(this);
             }
         }
 
@@ -2456,45 +2479,45 @@
         private sealed class <>c
         {
             public static readonly DocumentWorkspace.<>c <>9 = new DocumentWorkspace.<>c();
-            public static Func<FileType, bool> <>9__235_0;
-            public static Func<DirectoryNotFoundException, string> <>9__242_10;
-            public static Func<PathTooLongException, string> <>9__242_11;
-            public static Func<IOException, string> <>9__242_12;
-            public static Func<SerializationException, string> <>9__242_13;
-            public static Func<OutOfMemoryException, string> <>9__242_14;
-            public static Func<Exception, string> <>9__242_15;
-            public static Func<UnauthorizedAccessException, string> <>9__242_7;
-            public static Func<SecurityException, string> <>9__242_8;
-            public static Func<FileNotFoundException, string> <>9__242_9;
+            public static Func<FileType, bool> <>9__236_0;
+            public static Func<DirectoryNotFoundException, string> <>9__243_10;
+            public static Func<PathTooLongException, string> <>9__243_11;
+            public static Func<IOException, string> <>9__243_12;
+            public static Func<SerializationException, string> <>9__243_13;
+            public static Func<OutOfMemoryException, string> <>9__243_14;
+            public static Func<Exception, string> <>9__243_15;
+            public static Func<UnauthorizedAccessException, string> <>9__243_7;
+            public static Func<SecurityException, string> <>9__243_8;
+            public static Func<FileNotFoundException, string> <>9__243_9;
 
-            internal bool <DoSaveAsDialog>b__235_0(FileType ft) => 
+            internal bool <DoSaveAsDialog>b__236_0(FileType ft) => 
                 ft.SupportsSaving;
 
-            internal string <LoadDocument>b__242_10(DirectoryNotFoundException ex) => 
+            internal string <LoadDocument>b__243_10(DirectoryNotFoundException ex) => 
                 "LoadImage.Error.DirectoryNotFoundException";
 
-            internal string <LoadDocument>b__242_11(PathTooLongException ex) => 
+            internal string <LoadDocument>b__243_11(PathTooLongException ex) => 
                 "LoadImage.Error.PathTooLongException";
 
-            internal string <LoadDocument>b__242_12(IOException ex) => 
+            internal string <LoadDocument>b__243_12(IOException ex) => 
                 "LoadImage.Error.IOException";
 
-            internal string <LoadDocument>b__242_13(SerializationException ex) => 
+            internal string <LoadDocument>b__243_13(SerializationException ex) => 
                 "LoadImage.Error.SerializationException";
 
-            internal string <LoadDocument>b__242_14(OutOfMemoryException ex) => 
+            internal string <LoadDocument>b__243_14(OutOfMemoryException ex) => 
                 "LoadImage.Error.OutOfMemoryException";
 
-            internal string <LoadDocument>b__242_15(Exception ex) => 
+            internal string <LoadDocument>b__243_15(Exception ex) => 
                 "LoadImage.Error.Exception";
 
-            internal string <LoadDocument>b__242_7(UnauthorizedAccessException ex) => 
+            internal string <LoadDocument>b__243_7(UnauthorizedAccessException ex) => 
                 "LoadImage.Error.UnauthorizedAccessException";
 
-            internal string <LoadDocument>b__242_8(SecurityException ex) => 
+            internal string <LoadDocument>b__243_8(SecurityException ex) => 
                 "LoadImage.Error.SecurityException";
 
-            internal string <LoadDocument>b__242_9(FileNotFoundException ex) => 
+            internal string <LoadDocument>b__243_9(FileNotFoundException ex) => 
                 "LoadImage.Error.FileNotFoundException";
         }
 

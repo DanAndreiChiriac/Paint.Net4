@@ -246,7 +246,7 @@
                     Thread.Sleep(this.updateLatency);
                     using (IRenderer<ColorBgra> renderer = tuple.Item1.CreateThumbnailRenderer(tuple.Item3))
                     {
-                        surface = renderer.ToCancellable<ColorBgra>(() => this.quitRenderThread).Parallelize<ColorBgra>(TilingStrategy.HorizontalSlices, 0, WorkItemQueuePriority.Lowest).ToSurface();
+                        surface = renderer.ToCancellable<ColorBgra>(CancellationTokenUtil.Create((Func<bool>) (() => this.quitRenderThread))).Parallelize<ColorBgra>(TilingStrategy.HorizontalSlices, 0, WorkItemQueuePriority.Lowest).ToSurface();
                     }
                     bool flag5 = false;
                     object obj4 = this.updateLock;

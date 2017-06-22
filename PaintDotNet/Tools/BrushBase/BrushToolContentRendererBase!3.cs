@@ -26,7 +26,7 @@
         protected abstract void OnRenderContent(ISurface<ColorBgra> dstContent, PointInt32 renderOffset);
         protected virtual void OnRenderMask(ISurface<ColorAlpha8> dstMask, PointInt32 renderOffset)
         {
-            this.changes.RenderCache.RenderMask(dstMask, renderOffset);
+            this.changes.RenderCache.RenderMask(dstMask, renderOffset, this);
         }
 
         protected TChanges Changes =>

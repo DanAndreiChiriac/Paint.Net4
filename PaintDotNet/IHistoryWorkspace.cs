@@ -8,6 +8,8 @@
 
     internal interface IHistoryWorkspace : IThreadAffinitizedObject
     {
+        void WaitWithProgress(Task task, ImageResource icon, string titleText, string headerText);
+
         Layer ActiveLayer { get; }
 
         int ActiveLayerIndex { get; }

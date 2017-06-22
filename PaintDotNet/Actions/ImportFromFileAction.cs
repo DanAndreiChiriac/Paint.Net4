@@ -217,7 +217,7 @@
             if (flag)
             {
                 NewLayerHistoryMemento memento4 = new NewLayerHistoryMemento(string.Empty, null, documentWorkspace, documentWorkspace.Document.Layers.Count);
-                documentWorkspace.Document.Layers.Add(layer);
+                documentWorkspace.Document.Layers.Add((Layer) layer);
                 items.Add(memento4);
             }
             if (flag)

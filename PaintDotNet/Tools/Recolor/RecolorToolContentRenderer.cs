@@ -27,16 +27,16 @@
             {
                 this.basisColor = GetBasisColor(changes, this.sampleSource);
             }
-            IRenderer<ColorAlpha8> stencilSource = new FillStencilByColorRenderer(this.sampleSource, this.basisColor, tolerance, () => base.IsCancellationRequested);
+            IRenderer<ColorAlpha8> stencilSource = new FillStencilByColorRenderer(this.sampleSource, this.basisColor, tolerance, this);
             if (changes.Antialiasing)
             {
-                renderer2 = new FeatheredMaskRenderer(this.sampleSource, changes.BasisColor, stencilSource, tolerance, () => base.IsCancellationRequested);
+                renderer2 = new FeatheredMaskRenderer(this.sampleSource, changes.BasisColor, stencilSource, tolerance, this);
             }
             else
             {
                 renderer2 = stencilSource;
             }
-            IRenderer<ColorAlpha8> first = changes.RenderCache.CreateMaskRenderer(activeLayer.Size());
+            IRenderer<ColorAlpha8> first = changes.RenderCache.CreateMaskRenderer(activeLayer.Size(), this);
             this.maskRenderer = new MultiplyRendererAlpha8(first, renderer2);
         }
 
@@ -54,9 +54,11 @@
         {
             SizeInt32 num = dstContent.Size<ColorBgra>();
             ColorBgra fillColor = base.Changes.FillColor;
+            base.ThrowIfCancellationRequested();
             this.sampleSource.Render(dstContent, renderOffset);
             for (int i = 0; i < num.Height; i++)
             {
+                base.ThrowIfCancellationRequested();
                 ColorBgra* rowPointer = (ColorBgra*) dstContent.GetRowPointer<ColorBgra>(i);
                 for (int j = 0; j < num.Width; j++)
                 {

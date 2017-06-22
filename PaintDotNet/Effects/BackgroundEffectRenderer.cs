@@ -8,6 +8,7 @@
     using System;
     using System.Drawing;
     using System.Runtime.CompilerServices;
+    using System.Runtime.InteropServices;
     using System.Threading;
 
     internal sealed class BackgroundEffectRenderer : IDisposable
@@ -40,7 +41,7 @@
         [field: CompilerGenerated]
         public event EventHandler StartingRendering;
 
-        public BackgroundEffectRenderer(Effect effect, EffectConfigToken effectToken, RenderArgs dstArgs, RenderArgs srcArgs, PdnRegion renderRegion, IRenderer<ColorAlpha8> clipMaskRenderer, int tileCount, int workerThreads)
+        public BackgroundEffectRenderer(Effect effect, EffectConfigToken effectToken, RenderArgs dstArgs, RenderArgs srcArgs, PdnRegion renderRegion, [Optional] IRenderer<ColorAlpha8> clipMaskRenderer, int tileCount, int workerThreads)
         {
             this.effect = effect;
             this.effectToken = effectToken;
