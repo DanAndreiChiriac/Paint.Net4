@@ -7,7 +7,7 @@
   <sub>Plus the <code>__BINARY__</code> has the exe and libs from which the source-was rendered.<br/> it is also a fully functional <strong>portable</strong> version of <em>Paint.Net</em>.</sub>
 </li>
 <li>
-  Just <code>PaintDotNet.Base.dll</code>: <a href="PaintDotNet.Base%20(PaintDotNet.Base.dll)/">PaintDotNet (Complete)/</a>.
+  Just <code>PaintDotNet.Base.dll</code>: <a href="PaintDotNet.Base%20(PaintDotNet.Base.dll)/">PaintDotNet (PaintDotNet.Base.dll)/</a>.
 </li>
 </ul>
 
