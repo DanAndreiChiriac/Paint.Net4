@@ -1,0 +1,29 @@
+﻿namespace PaintDotNet.Imaging
+{
+    using System;
+
+    public static class ImagingContainerFormats
+    {
+        public static ImagingContainerFormat Bmp =>
+            new ImagingContainerFormat(new Guid(0xaf1d87e, 0xfcfe, 0x4188, 0xbd, 0xeb, 0xa7, 0x90, 100, 0x71, 0xcb, 0xe3));
+
+        public static ImagingContainerFormat Gif =>
+            new ImagingContainerFormat(new Guid(0x1f8a5601, 0x7d4d, 0x4cbd, 0x9c, 130, 0x1b, 200, 0xd4, 0xee, 0xb9, 0xa5));
+
+        public static ImagingContainerFormat Ico =>
+            new ImagingContainerFormat(new Guid(0xa3a860c4, 0x338f, 0x4c17, 0x91, 0x9a, 0xfb, 0xa4, 0xb5, 0x62, 0x8f, 0x21));
+
+        public static ImagingContainerFormat Jpeg =>
+            new ImagingContainerFormat(new Guid(0x19e4a5aa, 0x5662, 0x4fc5, 160, 0xc0, 0x17, 0x58, 2, 0x8e, 0x10, 0x57));
+
+        public static ImagingContainerFormat Png =>
+            new ImagingContainerFormat(new Guid(0x1b7cfaf4, 0x713f, 0x473c, 0xbb, 0xcd, 0x61, 0x37, 0x42, 0x5f, 0xae, 0xaf));
+
+        public static ImagingContainerFormat Tiff =>
+            new ImagingContainerFormat(new Guid(0x163bcc30, 0xe2e9, 0x4f0b, 150, 0x1d, 0xa3, 0xe9, 0xfd, 0xb7, 0x88, 0xa3));
+
+        public static ImagingContainerFormat Wmp =>
+            new ImagingContainerFormat(new Guid(0x57a37caa, 0x367a, 0x4540, 0x91, 0x6b, 0xf1, 0x83, 0xc5, 9, 0x3a, 0x4b));
+    }
+}
+
